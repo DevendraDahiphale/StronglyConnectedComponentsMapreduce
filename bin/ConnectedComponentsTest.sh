@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source config.txt
+source ./config.txt
 
 for original_input in $DATASET/input*
 do
@@ -8,6 +8,8 @@ do
 	if [ "${original_input: -1}" == "~" ]; then
 		continue
 	fi
+
+	export HADOOP=hadoop
 
 	base_input=$(basename $original_input)
 	input="${base_input%.*}"
@@ -21,6 +23,8 @@ do
 
 	# Start the Job and check if it is compleated correctly
 	echo "ConnectedComponents Job started !"
+	echo $input
+	echo $output
 	cc_result=$($HADOOP jar $JAR_PATH pad.ConnectedComponents $input $output 2>&1)
 	cc_out=$?
 	if [ $cc_out == 1 ]; then

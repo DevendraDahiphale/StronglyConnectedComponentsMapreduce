@@ -88,7 +88,7 @@ public class ConnectedComponents
 		do {
 			String suf = "__";	
 			StarDriver largeStar, smallStar;
-			long i = last;
+			long i = prev;
 			
 			System.out.println("new iteration " + this.input.suffix( suf + i ) + "  " + this.input.suffix( "_" + (i + 1) ));
 			do
@@ -131,6 +131,7 @@ public class ConnectedComponents
 			}
 			this.fs.delete(  this.input.suffix( "_" + i ), true );
 			if ( preCC < term.getNumClusters()) {
+				System.out.println("CC " + term.getNumClusters());
 				preCC = term.getNumClusters();
 				last = prev;
 			}

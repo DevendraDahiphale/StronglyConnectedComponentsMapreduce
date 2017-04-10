@@ -45,7 +45,7 @@ public class EdgeRemoverMapper extends Mapper<IntWritable, IntWritable, IntWrita
 	public void setup( Context context )
 	{
 		//smallStar = context.getConfiguration().get( "type" ).equals( "SMALL" );
-		edgeNumber = Integer.parseInt(context.getConfiguration().get( "edgeId" ));
+		edgeNumber = Integer.parseInt(context.getConfiguration().get( "type" ));
 		edgeCounter = 0;
 	}
 	
@@ -58,18 +58,21 @@ public class EdgeRemoverMapper extends Mapper<IntWritable, IntWritable, IntWrita
 	* @param context	context of this Job.
 	* @throws IOException, InterruptedException
 	*/
-	public void map(NodesPairWritable nodeID, IntWritable neighbourID, Context context ) throws IOException, InterruptedException 
+	public void map(IntWritable nodeID, IntWritable neighbourID, Context context ) throws IOException, InterruptedException 
 	{
-		if(edgeNumber == edgeCounter && neighbourID.get() != -1) {
+		if(edgeNumber == context.getCounter(UtilCounters.NUM_EDGE_COUNTER).getValue() && neighbourID.get() != -1) {
 			System.out.println("Skipping Edge " + edgeCounter);
+			context.getCounter( UtilCounters.NUM_EDGE_COUNTER ).increment( 1 );
 			return;		
 		}
 
+	//	System.out.println("in map of edge remover, edgenumber " + edgeNumber + "edgeCOunter " + edgeCounter);
+
 		//pair.NodeID = nodeID.get();
 		//pair.NeighbourID =  neighbourID.get();
-		this.nodeID.set( nodeID.NodeID );		
-		context.write( this.nodeID, neighbourID );
+//		this.nodeID.set( nodeID );		
+		context.write( nodeID, neighbourID );
 		if(neighbourID.get() != -1)
-			edgeCounter++;
+			context.getCounter( UtilCounters.NUM_EDGE_COUNTER ).increment( 1 );
 	}
 }

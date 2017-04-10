@@ -77,12 +77,12 @@ public class EdgeRemover extends Configured implements Tool
 		// GenericOptionsParser invocation in order to suppress the hadoop warning.
 		new GenericOptionsParser( conf, args );
 		//conf.set( "type", this.type.toString() );
-		conf.set("edgeId", Long.toString(this.edgeNumber));
+		conf.set("type", Long.toString(this.edgeNumber));
 		Job job = new Job( conf, this.title );
 		job.setJarByClass( EdgeRemover.class );
 	
-		//job.setMapOutputKeyClass(IntWritable.class);
-		//job.setMapOutputValueClass( IntWritable.class );
+		job.setMapOutputKeyClass(IntWritable.class);
+		job.setMapOutputValueClass( IntWritable.class );
 		job.setOutputKeyClass( IntWritable.class );
 		job.setOutputValueClass( IntWritable.class );
 		
@@ -105,6 +105,7 @@ public class EdgeRemover extends Configured implements Tool
 		
 		// Set up the private variable looking to the counter value
 	//	this.numChanges = job.getCounters().findCounter( UtilCounters.NUM_CHANGES ).getValue();
+		System.out.println("edge counter " + job.getCounters().findCounter( UtilCounters.NUM_EDGE_COUNTER ).getValue());
 		return 0;
 	}
 	
@@ -137,14 +138,14 @@ public class EdgeRemover extends Configured implements Tool
 		// Execute the Small-Star or Large-Star Job
 		Path input = new Path( args[1] );
 		Path output = new Path( args[2] );
-//		System.out.println( "Start " + name + "-Star." );
+		System.out.println( "removing 0 edge" );
 		EdgeRemover star = new EdgeRemover( input, output, 0, true );
 		if ( star.run( null ) != 0 )
 		{
 			FileSystem.get( new Configuration() ).delete( output, true  );
 			System.exit( 1 );
 		}
-//		System.out.println( "End " + name + "-Star.");
+		System.out.println( "remved 0 edge");
 		
 		System.exit( 0 );
 	}

@@ -15,5 +15,7 @@ public enum UtilCounters
 	/// Count the number of clusters found malformed from the \see CheckReducer Tasks.
 	NUM_ERRORS,
 
-	NUM_EDGES
+	NUM_EDGES,
+
+	NUM_EDGE_COUNTER
 }

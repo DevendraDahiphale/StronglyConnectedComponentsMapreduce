@@ -37,7 +37,7 @@ public class ConnectedComponents
 	private final Path input, output;
 	private final FileSystem fs;
 	private InputType type;
-	private long numCliques, numInitialNodes, numNodes, numClusters;
+	private long numCliques, numInitialNodes, numNodes, numClusters, numOfEdges;
 	private boolean testOk;
 	
 	/**
@@ -71,57 +71,89 @@ public class ConnectedComponents
 	 */
 	public boolean run() throws Exception
 	{	
+		long last = 0;
+		long prev = 0;
+		long edgeNumber = 0;
+		long preCC = 0;
+		TerminationDriver term;
 		// Run initialization in order to transform the adjacency list or cliques list into a edges list <nodeID, neighborID>.
-		InitializationDriver init = new InitializationDriver( this.input, this.input.suffix( "_0" ), false );
+		InitializationDriver init = new InitializationDriver( this.input, this.input.suffix( "__0" ), false );
 		if ( init.run( null ) != 0 )
 		{
-			this.fs.delete( this.input.suffix( "_0" ), true );
+			this.fs.delete( this.input.suffix( "___0" ), true );
 			return false;
 		}
-		
-		StarDriver largeStar, smallStar;
-		int i = 0;
-		do
-		{
-			largeStar = new StarDriver( StarDriverType.LARGE, this.input.suffix( "_" + i ), this.input.suffix( "_" + (i+1) ), i, false );
-			if ( largeStar.run( null ) != 0 )
+		this.numOfEdges = init.getNumEdges();
+		System.out.println("Number of Edges in the graph " + this.numOfEdges);
+		do {
+			String suf = "__";	
+			StarDriver largeStar, smallStar;
+			long i = last;
+			
+			System.out.println("new iteration " + this.input.suffix( suf + i ) + "  " + this.input.suffix( "_" + (i + 1) ));
+			do
+			{
+				largeStar = new StarDriver( StarDriverType.LARGE, this.input.suffix( suf + i ), this.input.suffix( "_" + (i+1) ), i, false );
+				if ( largeStar.run( null ) != 0 )
+				{
+					this.fs.delete( this.input.suffix( "_" + i ), true );
+					this.fs.delete( this.input.suffix( "_" + (i+1) ), true );
+					return false;
+				}
+			
+				// Delete previous output
+				if("_".compareTo(suf) == 0)
+					this.fs.delete( this.input.suffix( "_" + i ), true );
+				i++;
+			
+				smallStar = new StarDriver( StarDriverType.SMALL, this.input.suffix( "_" + i ), this.input.suffix( "_" + (i+1) ), i, false );
+				if ( smallStar.run( null ) != 0 )
+				{
+					this.fs.delete( this.input.suffix( "_" + i ), true );
+					this.fs.delete( this.input.suffix( "_" + (i+1) ), true );
+					return false;
+				}
+				
+				// Delete previous output
+				this.fs.delete( this.input.suffix( "_" + i ), true );
+				suf = "_";
+				i++;
+			} while ( (largeStar.getNumChanges() + smallStar.getNumChanges() != 0) && (i < 2*MAX_ITERATIONS) );
+			System.out.println("this iteration ended");
+	
+			// Run it in order to transform the edges list <nodeID, neighborID> into sets of nodes (clusters)
+			term = new TerminationDriver( this.input.suffix( "_" + i ), this.output.suffix("__" + prev), false );
+			if ( term.run( null ) != 0 )
 			{
 				this.fs.delete( this.input.suffix( "_" + i ), true );
-				this.fs.delete( this.input.suffix( "_" + (i+1) ), true );
+				this.fs.delete( this.output, true );
 				return false;
 			}
-			
-			// Delete previous output
-			this.fs.delete( this.input.suffix( "_" + i ), true );
-			i++;
-			
-			smallStar = new StarDriver( StarDriverType.SMALL, this.input.suffix( "_" + i ), this.input.suffix( "_" + (i+1) ), i, false );
-			if ( smallStar.run( null ) != 0 )
+			this.fs.delete(  this.input.suffix( "_" + i ), true );
+			if ( preCC < term.getNumClusters()) {
+				preCC = term.getNumClusters();
+				last = prev;
+			}
+			else {	
+				//this.fs.delete( this.input.suffix( "__" + prev ), true );
+			}
+			System.out.println("removing edge " + edgeNumber);
+
+			EdgeRemover eRemover = new EdgeRemover(this.input.suffix("__" + last), this.input.suffix( "__" + (prev + 1)), edgeNumber, true); 	
+			if ( eRemover.run( null ) != 0 )
 			{
-				this.fs.delete( this.input.suffix( "_" + i ), true );
-				this.fs.delete( this.input.suffix( "_" + (i+1) ), true );
+				this.fs.delete( this.input.suffix( "___" + last ), true );
+				this.fs.delete( this.input.suffix( "___" + (prev + 1) ), true );
 				return false;
 			}
-			
-			// Delete previous output
-			this.fs.delete( this.input.suffix( "_" + i ), true );
-			i++;
-		}
-		while ( (largeStar.getNumChanges() + smallStar.getNumChanges() != 0) && (i < 2*MAX_ITERATIONS) );
-		
-		// Run it in order to transform the edges list <nodeID, neighborID> into sets of nodes (clusters)
-		TerminationDriver term = new TerminationDriver( this.input.suffix( "_" + i ), this.output, false );
-		if ( term.run( null ) != 0 )
-		{
-			this.fs.delete( this.input.suffix( "_" + i ), true );
-			this.fs.delete( this.output, true );
-			return false;
-		}
+			System.out.println("removed " + edgeNumber);
+			edgeNumber++;
+			prev++;
+		} while (edgeNumber <= this.numOfEdges);
 
 		// Delete last iteration
-		this.fs.delete(  this.input.suffix( "_" + i ), true );
 		
-		CheckDriver check = new CheckDriver( this.output, false );
+		CheckDriver check = new CheckDriver( this.output.suffix("__" + (prev - 1)), false );
 		if ( check.run( null ) != 0)
 			return false;
 		

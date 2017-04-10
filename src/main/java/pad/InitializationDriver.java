@@ -53,7 +53,7 @@ public class InitializationDriver extends Configured implements Tool
 	private final Path input, output;
 	private final boolean verbose;
 	private InputType type;
-	private long numCliques, numInitialNodes;
+	private long numCliques, numInitialNodes, numEdges;
 	
 	/**
 	* Initializes a new instance of the InitializationDriver class.
@@ -171,6 +171,7 @@ public class InitializationDriver extends Configured implements Tool
 		// Set up the private variables looking to the counters value
 		this.numCliques = job.getCounters().findCounter( UtilCounters.NUM_CLIQUES ).getValue();
 		this.numInitialNodes = job.getCounters().findCounter( UtilCounters.NUM_INITIAL_NODES ).getValue();
+		this.numEdges = job.getCounters().findCounter( UtilCounters.NUM_EDGES ).getValue();
 		
 		if ( this.type == InputType.CLIQUES_LIST )
 		{
@@ -210,6 +211,11 @@ public class InitializationDriver extends Configured implements Tool
 	public long getNumCliques()
 	{
 		return this.numCliques;
+	}
+
+	public long getNumEdges()
+	{
+		return this.numEdges;
 	}
 	
 	/**

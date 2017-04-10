@@ -78,8 +78,10 @@ public class InitializationMapperAdjacency extends Mapper<LongWritable, Text, In
 		{
 			neighbourID.set( Integer.parseInt( neighbours[i] ) );
 			// only if nodeID > neighbourID
-			if ( nodeID.get() > neighbourID.get() )
+			if ( nodeID.get() > neighbourID.get() ) {
 				context.write( nodeID, neighbourID );
+				context.getCounter( UtilCounters.NUM_EDGES ).increment( 1 );
+			}
 		}
 	}
 }

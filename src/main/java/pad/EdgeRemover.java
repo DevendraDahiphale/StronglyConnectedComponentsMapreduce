@@ -1,5 +1,5 @@
 /**
- *	@file StarDriver.java
+ *	@file EdgeRemover.java
  *	@brief Driver of the Job responsible for executing the Small-Star or Large-Star operation on the input graph.
  *  @author Federico Conte (draxent)
  *  
@@ -35,16 +35,17 @@ import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.util.Tool;
 
 /**	Driver of the Job responsible for executing the Small-Star or Large-Star operation on the input graph. */
-public class StarDriver extends Configured implements Tool
+public class EdgeRemover extends Configured implements Tool
 {
 	/** The StarDriver can be of type Large-StarDriver or Small-StarDriver */
-	public enum StarDriverType { LARGE, SMALL };
+//	public enum StarDriverType { LARGE, SMALL };
 	
 	private final String title;
-	private final StarDriverType type;
+//	private final StarDriverType type;
 	private final Path input, output;
 	private final boolean verbose;
-	private long numChanges;
+	private final long edgeNumber;
+//	private long numChanges;
 	
 	/**
 	* Initializes a new instance of the StarDriver class.
@@ -54,12 +55,13 @@ public class StarDriver extends Configured implements Tool
 	* @param iteration	used to build the title of this Job.
 	* @param verbose	if <c>true</c> shows on screen the messages of the Job execution.
 	*/
-	public StarDriver( StarDriverType type, Path input, Path output, long iteration, boolean verbose )
+	public EdgeRemover( Path input, Path output, long edgeNumber, boolean verbose )
 	{
-		this.type = type;
-		this.title = type.equals( StarDriverType.SMALL ) ? "Small-Star" + iteration : "Large-Star" + iteration;
+	//	this.type = type;
+		this.title = "EdgeRemover_"  + Long.toString(edgeNumber);
 		this.input = input;
 		this.output = output;
+		this.edgeNumber = edgeNumber;
 		this.verbose = verbose;
 	}
 	
@@ -74,20 +76,23 @@ public class StarDriver extends Configured implements Tool
 		Configuration conf = new Configuration();
 		// GenericOptionsParser invocation in order to suppress the hadoop warning.
 		new GenericOptionsParser( conf, args );
-		conf.set( "type", this.type.toString() );
+		//conf.set( "type", this.type.toString() );
+		conf.set("edgeId", Long.toString(this.edgeNumber));
 		Job job = new Job( conf, this.title );
-		job.setJarByClass( StarDriver.class );
+		job.setJarByClass( EdgeRemover.class );
 	
-		job.setMapOutputKeyClass( NodesPairWritable.class );
-		job.setMapOutputValueClass( IntWritable.class );
+		//job.setMapOutputKeyClass(IntWritable.class);
+		//job.setMapOutputValueClass( IntWritable.class );
 		job.setOutputKeyClass( IntWritable.class );
 		job.setOutputValueClass( IntWritable.class );
+		
 	
-		job.setMapperClass( StarMapper.class );
-		job.setCombinerClass( StarCombiner.class );
-		job.setPartitionerClass( NodePartitioner.class );
-		job.setGroupingComparatorClass( NodeGroupingComparator.class );
-		job.setReducerClass( StarReducer.class );
+		job.setMapperClass(EdgeRemoverMapper.class );
+		job.setNumReduceTasks(0);
+		//job.setCombinerClass( StarCombiner.class );
+		//job.setPartitionerClass( NodePartitioner.class );
+		//job.setGroupingComparatorClass( NodeGroupingComparator.class );
+		//job.setReducerClass( StarReducer.class );
 	
 		job.setInputFormatClass( SequenceFileInputFormat.class );
 		job.setOutputFormatClass( SequenceFileOutputFormat.class );
@@ -99,7 +104,7 @@ public class StarDriver extends Configured implements Tool
 			return 1;
 		
 		// Set up the private variable looking to the counter value
-		this.numChanges = job.getCounters().findCounter( UtilCounters.NUM_CHANGES ).getValue();
+	//	this.numChanges = job.getCounters().findCounter( UtilCounters.NUM_CHANGES ).getValue();
 		return 0;
 	}
 	
@@ -107,10 +112,10 @@ public class StarDriver extends Configured implements Tool
 	 * Return the number of changes occurred during the operation Small-Star or Large-Star.
 	 * @return 	number of changes.
 	 */
-	public long getNumChanges()
-	{
-		return this.numChanges;
-	}
+	//public long getNumChanges()
+//	{
+		//return this.numChanges;
+//	}
 	
 	/**
 	 * Main of the \see StarDriver class.
@@ -126,20 +131,20 @@ public class StarDriver extends Configured implements Tool
 		}
 		
 		// Check what Job we need to execute: Small-Star or Large-Star
-		StarDriverType type = args[0].toLowerCase().equals("small") ? StarDriverType.SMALL : StarDriverType.LARGE;
-		String name = ( type == StarDriverType.SMALL ) ? "Small" : "Large";
+	///	StarDriverType type = args[0].toLowerCase().equals("small") ? StarDriverType.SMALL : StarDriverType.LARGE;
+	//	String name = ( type == StarDriverType.SMALL ) ? "Small" : "Large";
 		
 		// Execute the Small-Star or Large-Star Job
 		Path input = new Path( args[1] );
 		Path output = new Path( args[2] );
-		System.out.println( "Start " + name + "-Star." );
-		StarDriver star = new StarDriver( type, input, output, 0, true );
+//		System.out.println( "Start " + name + "-Star." );
+		EdgeRemover star = new EdgeRemover( input, output, 0, true );
 		if ( star.run( null ) != 0 )
 		{
 			FileSystem.get( new Configuration() ).delete( output, true  );
 			System.exit( 1 );
 		}
-		System.out.println( "End " + name + "-Star.");
+//		System.out.println( "End " + name + "-Star.");
 		
 		System.exit( 0 );
 	}

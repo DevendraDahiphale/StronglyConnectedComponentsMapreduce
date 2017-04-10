@@ -13,5 +13,7 @@ public enum UtilCounters
 	/// Count the number of changes occurred during the operation Small-Star or Large-Star.
 	NUM_CHANGES,
 	/// Count the number of clusters found malformed from the \see CheckReducer Tasks.
-	NUM_ERRORS
+	NUM_ERRORS,
+
+	NUM_EDGES
 }

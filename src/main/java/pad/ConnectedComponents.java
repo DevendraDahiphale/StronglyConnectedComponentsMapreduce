@@ -83,7 +83,7 @@ public class ConnectedComponents
 			this.fs.delete( this.input.suffix( "___0" ), true );
 			return false;
 		}
-		this.numOfEdges = init.getNumEdges();
+		this.numOfEdges = init.getNumEdges() + 1;
 		System.out.println("Number of Edges in the graph " + this.numOfEdges);
 		do {
 			String suf = "__";	
@@ -130,12 +130,15 @@ public class ConnectedComponents
 				return false;
 			}
 			this.fs.delete(  this.input.suffix( "_" + i ), true );
+			System.out.println("**********CC " + term.getNumClusters());
 			if ( preCC < term.getNumClusters()) {
 				System.out.println("CC " + term.getNumClusters());
 				preCC = term.getNumClusters();
 				last = prev;
+				this.numOfEdges = this.numOfEdges - 1;
 			}
 			else {	
+				edgeNumber++;
 				//this.fs.delete( this.input.suffix( "__" + prev ), true );
 			}
 			System.out.println("removing edge " + edgeNumber);
@@ -148,7 +151,6 @@ public class ConnectedComponents
 				return false;
 			}
 			System.out.println("removed " + edgeNumber);
-			edgeNumber++;
 			prev++;
 		} while (edgeNumber <= this.numOfEdges);
 

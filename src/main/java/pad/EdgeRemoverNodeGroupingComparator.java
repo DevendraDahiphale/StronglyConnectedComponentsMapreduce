@@ -1,11 +1,11 @@
 /**
  *	@file NodeGroupingComparator.java
- *	@brief Thanks to this class, the reducer bundles together records with the same
+ *	@brief the reducer bundles together records with the same
  *		   NodeID while it is streaming the mapper output records from local disk.
- *  @author Federico Conte (draxent)
+ *  @author Devendra Dahiphale
  *  
- *	Copyright 2015 Federico Conte
- *	https://github.com/Draxent/ConnectedComponents
+ *	Copyright 2017 Devendra Dahiphale
+ *	https://github.com/DevendraDahiphale
  * 
  *	Licensed under the Apache License, Version 2.0 (the "License"); 
  *	you may not use this file except in compliance with the License. 

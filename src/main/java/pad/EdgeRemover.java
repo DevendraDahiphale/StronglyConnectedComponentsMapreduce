@@ -1,10 +1,10 @@
 /**
  *	@file EdgeRemover.java
- *	@brief Driver of the Job responsible for executing the Small-Star or Large-Star operation on the input graph.
- *  @author Federico Conte (draxent)
+ *	@brief Input handler job for removing an edge and regenerating new edge list
+ *  @author Devendra Dahiphale
  *  
- *	Copyright 2015 Federico Conte
- *	https://github.com/Draxent/ConnectedComponents
+ *	Copyright 2017 Devendra Dahiphale
+ *	https://github.com/DevendraDahiphale
  * 
  *	Licensed under the Apache License, Version 2.0 (the "License"); 
  *	you may not use this file except in compliance with the License. 

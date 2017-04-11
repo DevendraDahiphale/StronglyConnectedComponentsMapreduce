@@ -35,6 +35,7 @@ public class EdgeRemoverMapper extends Mapper<IntWritable, IntWritable, IntWrita
 	private int edgeCounter;
 	private IntWritable nodeID = new IntWritable();
 	private NodesPairWritable pair = new NodesPairWritable();
+	public static final IntWritable MINUS_ONE = new IntWritable( -1 );
 
 	/**
 	* Setup method of the this StarMapper class.
@@ -72,7 +73,6 @@ public class EdgeRemoverMapper extends Mapper<IntWritable, IntWritable, IntWrita
 		//pair.NeighbourID =  neighbourID.get();
 //		this.nodeID.set( nodeID );		
 		context.write( nodeID, neighbourID );
-		if(neighbourID.get() != -1)
-			context.getCounter( UtilCounters.NUM_EDGE_COUNTER ).increment( 1 );
+		context.getCounter( UtilCounters.NUM_EDGE_COUNTER ).increment( 1 );
 	}
 }

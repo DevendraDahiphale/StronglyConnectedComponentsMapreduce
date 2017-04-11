@@ -67,6 +67,7 @@ public class InitializationMapperAdjacency extends Mapper<LongWritable, Text, In
 		{
 			// NeighbourID is set to minus one, to indicate that the node is alone.
 			context.write( nodeID, MINUS_ONE );
+			context.getCounter( UtilCounters.NUM_EDGES ).increment( 1 );
 			return;
 		}
 		

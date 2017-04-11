@@ -76,6 +76,7 @@ public class EdgeRemoverMapper extends Mapper<IntWritable, IntWritable, IntWrita
 			context.write( nodeID, neighbourID );
 		} else {
 			context.write( neighbourID, nodeID );
+			context.write( nodeID, neighbourID );
 		}
 	//	context.getCounter( UtilCounters.NUM_EDGE_COUNTER ).increment( 1 );
 	}

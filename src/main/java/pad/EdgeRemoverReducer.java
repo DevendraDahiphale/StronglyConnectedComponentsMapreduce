@@ -36,6 +36,7 @@ public class EdgeRemoverReducer extends Reducer<IntWritable, IntWritable, IntWri
 	private IntWritable minNodeID = new IntWritable();
 	private boolean smallStar;
 	private int edgeNumber;
+	private int removedEdgeStart;
 	
 	/**
 	* Setup method of the this StarReducer class.
@@ -47,6 +48,7 @@ public class EdgeRemoverReducer extends Reducer<IntWritable, IntWritable, IntWri
 	{
 		//smallStar = context.getConfiguration().get( "type" ).equals( "SMALL" );
 		edgeNumber = Integer.parseInt(context.getConfiguration().get( "edgeID" ));
+		removedEdgeStart = -3; // not used yet
 	}
 	
 	/**
@@ -63,7 +65,7 @@ public class EdgeRemoverReducer extends Reducer<IntWritable, IntWritable, IntWri
 	*/
 	public void reduce( IntWritable nodeID, Iterable<IntWritable> neighbourhood, Context context ) throws IOException, InterruptedException 
 	{
-	//	long numProducedPairs = 0;
+		long numProducedPairs = 0;
 		
 		// This means that the nodeID is isolated, so we emit it unchanged
 		//if ( Iterables.get(neighbourhood, 0) == -1 )
@@ -86,6 +88,7 @@ public class EdgeRemoverReducer extends Reducer<IntWritable, IntWritable, IntWri
 		
 		// Do not exists a node with ID equal to minus two ( minus one already used to indicate loneliness )
 		int lastNodeSeen = -2;
+		boolean edgeDropped = false;
 		for ( IntWritable neighbour : neighbourhood )
 		{
 			if(neighbour.get() == -1) {
@@ -103,15 +106,30 @@ public class EdgeRemoverReducer extends Reducer<IntWritable, IntWritable, IntWri
 			
 			//if ( cond )
 			//{
-			if(edgeNumber != context.getCounter(UtilCounters.NUM_EDGE_COUNTER).getValue())
-				context.write( neighbour, nodeID);
+			if( nodeID.get() < neighbour.get() ) {
+				if(edgeNumber != context.getCounter(UtilCounters.NUM_EDGE_COUNTER).getValue())
+					context.write( neighbour, nodeID);
+				else { 
+					edgeDropped = true;
+					removedEdgeStart = neighbour.get();
+				}
 			
-			context.getCounter( UtilCounters.NUM_EDGE_COUNTER ).increment( 1 );
-			//	numProducedPairs++;
+				context.getCounter( UtilCounters.NUM_EDGE_COUNTER ).increment( 1 );
+			}
+			numProducedPairs++;
 		//	}
 			
 			// Store the last neighbourId that we have processed.
 			lastNodeSeen = neighbour.get();
+		}
+		if( numProducedPairs == 1) {
+			if( edgeDropped ) {
+				context.write( nodeID, MINUS_ONE );
+			}
+
+			if(removedEdgeStart == nodeID.get()) {
+				context.write( nodeID, MINUS_ONE );
+			}
 		}
 		
 		// If the NodeID has not the minimum label means that the produced pairs will be different,

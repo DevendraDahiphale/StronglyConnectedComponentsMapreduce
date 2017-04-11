@@ -61,18 +61,22 @@ public class EdgeRemoverMapper extends Mapper<IntWritable, IntWritable, IntWrita
 	*/
 	public void map(IntWritable nodeID, IntWritable neighbourID, Context context ) throws IOException, InterruptedException 
 	{
-		if(edgeNumber == context.getCounter(UtilCounters.NUM_EDGE_COUNTER).getValue() && neighbourID.get() != -1) {
-			System.out.println("Skipping Edge " + edgeCounter);
-			context.getCounter( UtilCounters.NUM_EDGE_COUNTER ).increment( 1 );
-			return;		
-		}
+//		if(edgeNumber == context.getCounter(UtilCounters.NUM_EDGE_COUNTER).getValue() && neighbourID.get() != -1) {
+//			System.out.println("Skipping Edge " + edgeCounter);
+//			context.getCounter( UtilCounters.NUM_EDGE_COUNTER ).increment( 1 );
+//			return;		
+//		}
 
 	//	System.out.println("in map of edge remover, edgenumber " + edgeNumber + "edgeCOunter " + edgeCounter);
 
 		//pair.NodeID = nodeID.get();
 		//pair.NeighbourID =  neighbourID.get();
-//		this.nodeID.set( nodeID );		
-		context.write( nodeID, neighbourID );
-		context.getCounter( UtilCounters.NUM_EDGE_COUNTER ).increment( 1 );
+//		this.nodeID.set( nodeID );
+		if(neighbourID.get() == -1) {
+			context.write( nodeID, neighbourID );
+		} else {
+			context.write( neighbourID, nodeID );
+		}
+	//	context.getCounter( UtilCounters.NUM_EDGE_COUNTER ).increment( 1 );
 	}
 }

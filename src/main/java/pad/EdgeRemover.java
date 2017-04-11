@@ -88,11 +88,11 @@ public class EdgeRemover extends Configured implements Tool
 		
 	
 		job.setMapperClass(EdgeRemoverMapper.class );
-		job.setNumReduceTasks(0);
-		//job.setCombinerClass( StarCombiner.class );
-		//job.setPartitionerClass( NodePartitioner.class );
-		//job.setGroupingComparatorClass( NodeGroupingComparator.class );
-		//job.setReducerClass( StarReducer.class );
+//		job.setNumReduceTasks(0);
+		job.setCombinerClass( EdgeRemoverCombiner.class );
+	//	job.setPartitionerClass( NodePartitioner.class );
+	//	job.setGroupingComparatorClass( NodeGroupingComparator.class );
+		job.setReducerClass( EdgeRemoverReducer.class );
 	
 		job.setInputFormatClass( SequenceFileInputFormat.class );
 		job.setOutputFormatClass( SequenceFileOutputFormat.class );

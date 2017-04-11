@@ -77,7 +77,7 @@ public class EdgeRemover extends Configured implements Tool
 		// GenericOptionsParser invocation in order to suppress the hadoop warning.
 		new GenericOptionsParser( conf, args );
 		//conf.set( "type", this.type.toString() );
-		conf.set("type", Long.toString(this.edgeNumber));
+		conf.set("edgeID", Long.toString(this.edgeNumber));
 		Job job = new Job( conf, this.title );
 		job.setJarByClass( EdgeRemover.class );
 	

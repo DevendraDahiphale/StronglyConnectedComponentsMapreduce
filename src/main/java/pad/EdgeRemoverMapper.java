@@ -45,7 +45,7 @@ public class EdgeRemoverMapper extends Mapper<IntWritable, IntWritable, IntWrita
 	public void setup( Context context )
 	{
 		//smallStar = context.getConfiguration().get( "type" ).equals( "SMALL" );
-		edgeNumber = Integer.parseInt(context.getConfiguration().get( "type" ));
+		edgeNumber = Integer.parseInt(context.getConfiguration().get( "edgeID" ));
 		edgeCounter = 0;
 	}
 	

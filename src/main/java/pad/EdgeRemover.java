@@ -91,7 +91,7 @@ public class EdgeRemover extends Configured implements Tool
 //		job.setNumReduceTasks(0);
 		job.setCombinerClass( EdgeRemoverCombiner.class );
 	//	job.setPartitionerClass( NodePartitioner.class );
-	//	job.setGroupingComparatorClass( NodeGroupingComparator.class );
+		job.setGroupingComparatorClass( EdgeRemoverNodeGroupingComparator.class );
 		job.setReducerClass( EdgeRemoverReducer.class );
 	
 		job.setInputFormatClass( SequenceFileInputFormat.class );
@@ -139,7 +139,7 @@ public class EdgeRemover extends Configured implements Tool
 		Path input = new Path( args[1] );
 		Path output = new Path( args[2] );
 		System.out.println( "removing 0 edge" );
-		EdgeRemover star = new EdgeRemover( input, output, 0, true );
+		EdgeRemover star = new EdgeRemover( input, output, Integer.parseInt(args[0]), true );
 		if ( star.run( null ) != 0 )
 		{
 			FileSystem.get( new Configuration() ).delete( output, true  );

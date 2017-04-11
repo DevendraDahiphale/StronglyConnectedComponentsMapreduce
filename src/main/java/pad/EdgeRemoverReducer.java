@@ -32,7 +32,7 @@ import pad.UtilCounters;
 public class EdgeRemoverReducer extends Reducer<IntWritable, IntWritable, IntWritable, IntWritable> 
 {
 	private static final IntWritable MINUS_ONE = new IntWritable( -1 );
-	private IntWritable nodeID = new IntWritable();
+	//private IntWritable nodeID = new IntWritable();
 	private IntWritable minNodeID = new IntWritable();
 	private boolean smallStar;
 	private int edgeNumber;
@@ -61,7 +61,7 @@ public class EdgeRemoverReducer extends Reducer<IntWritable, IntWritable, IntWri
 	* @param context		context of this Job.
 	* @throws IOException, InterruptedException
 	*/
-	public void reduce( IntWritable pair, Iterable<IntWritable> neighbourhood, Context context ) throws IOException, InterruptedException 
+	public void reduce( IntWritable nodeID, Iterable<IntWritable> neighbourhood, Context context ) throws IOException, InterruptedException 
 	{
 	//	long numProducedPairs = 0;
 		
@@ -89,7 +89,7 @@ public class EdgeRemoverReducer extends Reducer<IntWritable, IntWritable, IntWri
 		for ( IntWritable neighbour : neighbourhood )
 		{
 			if(neighbour.get() == -1) {
-				context.write( pair, MINUS_ONE );
+				context.write( nodeID, MINUS_ONE );
 				context.getCounter( UtilCounters.NUM_EDGE_COUNTER ).increment( 1 );
 				break;
 			}
@@ -104,7 +104,7 @@ public class EdgeRemoverReducer extends Reducer<IntWritable, IntWritable, IntWri
 			//if ( cond )
 			//{
 			if(edgeNumber != context.getCounter(UtilCounters.NUM_EDGE_COUNTER).getValue())
-				context.write( neighbour, pair);
+				context.write( neighbour, nodeID);
 			
 			context.getCounter( UtilCounters.NUM_EDGE_COUNTER ).increment( 1 );
 			//	numProducedPairs++;

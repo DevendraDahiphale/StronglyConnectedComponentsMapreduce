@@ -112,6 +112,7 @@ public class EdgeRemoverReducer extends Reducer<IntWritable, IntWritable, IntWri
 				else { 
 					edgeDropped = true;
 					removedEdgeStart = neighbour.get();
+					context.getCounter( UtilCounters.REMOVED_EDGE_END ).increment( removedEdgeStart );
 				}
 			
 				context.getCounter( UtilCounters.NUM_EDGE_COUNTER ).increment( 1 );
@@ -127,7 +128,7 @@ public class EdgeRemoverReducer extends Reducer<IntWritable, IntWritable, IntWri
 				context.write( nodeID, MINUS_ONE );
 			}
 
-			if(removedEdgeStart == nodeID.get()) {
+			if(context.getCounter(UtilCounters.REMOVED_EDGE_END).getValue() == nodeID.get()) {
 				context.write( nodeID, MINUS_ONE );
 			}
 		}

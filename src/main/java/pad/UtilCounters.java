@@ -17,5 +17,7 @@ public enum UtilCounters
 
 	NUM_EDGES,
 
-	NUM_EDGE_COUNTER
+	NUM_EDGE_COUNTER,
+
+	REMOVED_EDGE_END
 }

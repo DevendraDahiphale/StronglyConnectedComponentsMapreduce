@@ -85,6 +85,7 @@ public class ConnectedComponents
 		}
 		this.numOfEdges = init.getNumEdges() + 1;
 		System.out.println("Number of Edges in the graph " + this.numOfEdges);
+		long start = System.currentTimeMillis();
 		do {
 			String suf = "__";	
 			StarDriver largeStar, smallStar;
@@ -150,9 +151,13 @@ public class ConnectedComponents
 				this.fs.delete( this.input.suffix( "___" + (prev + 1) ), true );
 				return false;
 			}
+			long end = System.currentTimeMillis();
+			System.out.println("Total Time Taken by Algorithm: " + (end - start)/1000);
+			start = end;
 			System.out.println("removed " + edgeNumber);
 			prev++;
 		} while (edgeNumber <= this.numOfEdges);
+
 
 		// Delete last iteration
 		
